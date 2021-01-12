@@ -2027,10 +2027,12 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    like: function like() {
+    like: function like(liked) {
       var current = this;
-      axios.post("http://127.0.0.1:8000/api/".concat(this.id, "/like")).then(function (response) {
-        if (response.data == "done") {
+      axios.post("http://127.0.0.1:8000/api/".concat(this.id, "/like"), {
+        liked: liked
+      }).then(function (response) {
+        if (response.data == "liked") {
           current.likesCounter++;
           current.likeBlue = true;
 
@@ -2038,20 +2040,7 @@ __webpack_require__.r(__webpack_exports__);
             current.dislikeBlue = false;
             current.dislikesCounter--;
           }
-        }
-
-        if (response.data == "removed") {
-          current.likesCounter--;
-          current.likeBlue = false;
-        }
-      })["catch"](function (e) {
-        return console.log(e);
-      });
-    },
-    dislike: function dislike() {
-      var current = this;
-      axios.post("http://127.0.0.1:8000/api/".concat(this.id, "/dislike")).then(function (response) {
-        if (response.data == "done") {
+        } else if (response.data == "disliked") {
           current.dislikesCounter++;
           current.dislikeBlue = true;
 
@@ -2062,8 +2051,15 @@ __webpack_require__.r(__webpack_exports__);
         }
 
         if (response.data == "removed") {
-          current.dislikesCounter--;
-          current.dislikeBlue = false;
+          if (current.likeBlue) {
+            current.likesCounter--;
+            current.likeBlue = false;
+          }
+
+          if (current.dislikeBlue) {
+            current.dislikeBlue = false;
+            current.dislikesCounter--;
+          }
         }
       })["catch"](function (e) {
         return console.log(e);
@@ -2073,10 +2069,12 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var current = this;
     axios.get("http://127.0.0.1:8000/api/".concat(this.id, "/isLikedBy")).then(function (response) {
-      current.likeBlue = response.data ? true : false;
-    });
-    axios.get("http://127.0.0.1:8000/api/".concat(this.id, "/isDislikedBy")).then(function (response) {
-      current.dislikeBlue = response.data ? true : false;
+      if (response.data == "liked") {
+        current.likeBlue = true;
+      } else if (response.data == "disliked") {
+        current.dislikeBlue = true;
+      } // current.likeBlue = response.data ? true : false;
+
     });
   }
 });
@@ -2145,6 +2143,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2158,6 +2167,7 @@ __webpack_require__.r(__webpack_exports__);
 
       this.toggle = !this.toggle;
       axios.get("/api/notifications").then(function (notifications) {
+        console.log(notifications);
         _this.notifications = notifications.data.length === 0 ? "No notifications yet." : notifications.data;
       })["catch"](function (err) {
         console.log(err);
@@ -33987,7 +33997,7 @@ var render = function() {
           on: {
             submit: function($event) {
               $event.preventDefault()
-              return _vm.like($event)
+              return _vm.like(true)
             }
           }
         },
@@ -34050,7 +34060,7 @@ var render = function() {
           on: {
             submit: function($event) {
               $event.preventDefault()
-              return _vm.dislike($event)
+              return _vm.like(false)
             }
           }
         },
@@ -34190,29 +34200,61 @@ var render = function() {
                         "li",
                         { key: notification.id, staticClass: "py-2" },
                         [
-                          _c(
-                            "a",
-                            {
-                              staticClass: "cursor-pointer",
-                              attrs: { href: "/" + notification.data.tweet_id },
-                              on: {
-                                click: function($event) {
-                                  return _vm.markAsRead(notification.id)
-                                }
-                              }
-                            },
-                            [
-                              notification.type ===
-                              "App\\Notifications\\LikeNotification"
-                                ? _c("span", [
+                          notification.type ===
+                          "App\\Notifications\\LikeNotification"
+                            ? _c(
+                                "a",
+                                {
+                                  staticClass: "cursor-pointer",
+                                  attrs: {
+                                    href: "/" + notification.data.tweet_id
+                                  },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.markAsRead(notification.id)
+                                    }
+                                  }
+                                },
+                                [
+                                  _c("span", [
                                     _c("strong", [
                                       _vm._v(_vm._s(notification.data.name))
                                     ]),
                                     _vm._v(" liked your post.\n            ")
                                   ])
-                                : _vm._e()
-                            ]
-                          )
+                                ]
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          notification.type ===
+                          "App\\Notifications\\FollowNotification"
+                            ? _c(
+                                "a",
+                                {
+                                  staticClass: "cursor-pointer",
+                                  attrs: {
+                                    href:
+                                      "/profile/" +
+                                      notification.data.user.username
+                                  },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.markAsRead(notification.id)
+                                    }
+                                  }
+                                },
+                                [
+                                  _c("span", [
+                                    _c("strong", [
+                                      _vm._v(
+                                        _vm._s(notification.data.user.name)
+                                      )
+                                    ]),
+                                    _vm._v(" followed you.\n            ")
+                                  ])
+                                ]
+                              )
+                            : _vm._e()
                         ]
                       )
                     }),

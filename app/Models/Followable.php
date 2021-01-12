@@ -2,6 +2,8 @@
 
 namespace App\models;
 
+use App\Notifications\FollowNotification;
+
 trait Followable
 {
     public function isFollow($user)
@@ -11,7 +13,10 @@ trait Followable
 
     public function toggleFollow($user)
     {
-        $this->following()->toggle($user);
+        $response = $this->following()->toggle($user);
+        if (!empty($response['attached'])) {
+            $user->notify(new FollowNotification($this));
+        }
     }
 
     public function following()

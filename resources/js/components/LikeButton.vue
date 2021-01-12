@@ -1,7 +1,7 @@
 <template>
   <div class="flex mt-4">
     <div class="flex items-center mr-4">
-      <form method="POST" @submit.prevent="like">
+      <form method="POST" @submit.prevent="like(true)">
         <button type="submit" class="outline-none focus:outline-none">
           <svg
             viewBox="0 0 20 20"
@@ -29,7 +29,7 @@
       <span class="text-xs text-gray-600">{{ likesCounter }}</span>
     </div>
     <div class="flex items-center mr-4">
-      <form method="POST" @submit.prevent="dislike">
+      <form method="POST" @submit.prevent="like(false)">
         <button type="submit" class="outline-none focus:outline-none">
           <svg
             viewBox="0 0 20 20"
@@ -71,33 +71,21 @@ export default {
     };
   },
   methods: {
-    like() {
+    like(liked) {
       let current = this;
       axios
-        .post(`http://127.0.0.1:8000/api/${this.id}/like`)
+        .post(`http://127.0.0.1:8000/api/${this.id}/like`, {
+          liked,
+        })
         .then(function (response) {
-          if (response.data == "done") {
+          if (response.data == "liked") {
             current.likesCounter++;
             current.likeBlue = true;
             if (current.dislikeBlue) {
               current.dislikeBlue = false;
               current.dislikesCounter--;
             }
-          }
-
-          if (response.data == "removed") {
-            current.likesCounter--;
-            current.likeBlue = false;
-          }
-        })
-        .catch((e) => console.log(e));
-    },
-    dislike() {
-      let current = this;
-      axios
-        .post(`http://127.0.0.1:8000/api/${this.id}/dislike`)
-        .then(function (response) {
-          if (response.data == "done") {
+          } else if (response.data == "disliked") {
             current.dislikesCounter++;
             current.dislikeBlue = true;
             if (current.likeBlue) {
@@ -107,8 +95,14 @@ export default {
           }
 
           if (response.data == "removed") {
-            current.dislikesCounter--;
-            current.dislikeBlue = false;
+            if (current.likeBlue) {
+              current.likesCounter--;
+              current.likeBlue = false;
+            }
+            if (current.dislikeBlue) {
+              current.dislikeBlue = false;
+              current.dislikesCounter--;
+            }
           }
         })
         .catch((e) => console.log(e));
@@ -119,13 +113,12 @@ export default {
     axios
       .get(`http://127.0.0.1:8000/api/${this.id}/isLikedBy`)
       .then(function (response) {
-        current.likeBlue = response.data ? true : false;
-      });
-
-    axios
-      .get(`http://127.0.0.1:8000/api/${this.id}/isDislikedBy`)
-      .then(function (response) {
-        current.dislikeBlue = response.data ? true : false;
+        if (response.data == "liked") {
+          current.likeBlue = true;
+        } else if (response.data == "disliked") {
+          current.dislikeBlue = true;
+        }
+        // current.likeBlue = response.data ? true : false;
       });
   },
 };

@@ -26,9 +26,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/{tweet}/like', [LikeController::class, 'like'])->name('like');
-    Route::post('/{tweet}/dislike', [LikeController::class, 'dislike'])->name('dislike');
     Route::get('/{tweet}/isLikedBy', [LikeController::class, 'isLikedBy'])->name('isLikedBy');
-    Route::get('/{tweet}/isDislikedBy', [LikeController::class, 'isDislikedBy'])->name('isDislikedBy');
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/{notification}/markasread', [NotificationController::class, 'markAsRead']);
 });

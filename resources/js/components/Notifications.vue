@@ -35,13 +35,24 @@
               :href="`/${notification.data.tweet_id}`"
               @click="markAsRead(notification.id)"
               class="cursor-pointer"
+              v-if="
+                notification.type === 'App\\Notifications\\LikeNotification'
+              "
             >
-              <span
-                v-if="
-                  notification.type === 'App\\Notifications\\LikeNotification'
-                "
-              >
+              <span>
                 <strong>{{ notification.data.name }}</strong> liked your post.
+              </span>
+            </a>
+            <a
+              :href="`/profile/${notification.data.user.username}`"
+              @click="markAsRead(notification.id)"
+              class="cursor-pointer"
+              v-if="
+                notification.type === 'App\\Notifications\\FollowNotification'
+              "
+            >
+              <span>
+                <strong>{{ notification.data.user.name }}</strong> followed you.
               </span>
             </a>
           </li>
@@ -65,6 +76,7 @@ export default {
       axios
         .get("/api/notifications")
         .then((notifications) => {
+          console.log(notifications);
           this.notifications =
             notifications.data.length === 0
               ? "No notifications yet."
