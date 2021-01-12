@@ -27,4 +27,9 @@ class TweetController extends Controller
 
         return back();
     }
+
+    public function show(Tweet $tweet)
+    {
+        return view('show-tweet', compact('tweet'));
+    }
 }

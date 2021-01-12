@@ -43,4 +43,11 @@ trait Likable
     {
         $this->likes()->where('user_id', $user->id)->delete();
     }
+
+    public function users()
+    {
+        return $this->likes->map(function ($like) {
+            return $like->user;
+        });
+    }
 }

@@ -13,6 +13,8 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
 
+
+
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
@@ -22,18 +24,19 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
-<body>
+<body class="relative">
     <div id="app">
         <div class="bg-teal-100 py-2">
             <header class="flex justify-between items-center container mx-auto">
-                <div>
-                    <a class="flex items-center" href="/">
-                        <span class="fa fa-leaf text-teal-500 mr-2" style="font-size: 25px" aria-hidden="true"></span>
-                        <h1 class="font-medium text-2xl font-serif">
-                            tweety
-                        </h1>
-                    </a>
-                </div>
+                <a class="flex items-center" href="/">
+                    <span class="fa fa-leaf text-teal-500 mr-2" style="font-size: 25px" aria-hidden="true"></span>
+                    <h1 class="font-medium text-2xl font-serif text-teal-800">
+                        tweeta
+                    </h1>
+                </a>
+                @auth
+                    <vue-notification></vue-notification>
+                @endauth
             </header>
         </div>
         <div>
